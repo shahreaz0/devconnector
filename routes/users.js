@@ -2,6 +2,7 @@ const router = require("express").Router();
 const Joi = require("joi");
 const gravatar = require("gravatar");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // models
 const User = require("../models/User");
@@ -19,6 +20,13 @@ const schema = Joi.object({
 // route POST api/users
 // desc create user
 // access Public
+
+// function test(cb) {
+
+// }
+
+// console.log(test());
+
 router.post("/", async (req, res) => {
 	const { error, value } = schema.validate(req.body);
 	if (error) return res.status(400).send(error);
@@ -43,7 +51,23 @@ router.post("/", async (req, res) => {
 		// save user to the db
 		await user.save();
 
-		res.send(user);
+		// generate jwt
+
+		const payload = {
+			user: {
+				id: user.id,
+			},
+		};
+
+		jwt.sign(
+			payload,
+			process.env.JWT_SECRET,
+			{ expiresIn: 3600 },
+			(err, token) => {
+				if (error) throw error;
+				res.json({ token });
+			}
+		);
 	} catch (error) {
 		console.log(error.message);
 		res.status(500).send("Server error");
