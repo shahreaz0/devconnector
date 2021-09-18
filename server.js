@@ -9,6 +9,7 @@ connectDB();
 
 // express config
 const app = express();
+app.use(express.json({ extended: false }));
 
 // routes
 app.get("/", (req, res) => {
