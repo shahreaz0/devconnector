@@ -7,28 +7,14 @@ const jwt = require("jsonwebtoken");
 // models
 const User = require("../models/User");
 
-// request body validation schema
-const schema = Joi.object({
-	name: Joi.string().min(3).max(30).required(),
-	password: Joi.string()
-		.pattern(new RegExp("^[a-zA-Z0-9]{6,30}$"))
-		.min(6)
-		.required(),
-	email: Joi.string().email().required(),
-});
+// configs
+const { registerSchema } = require("../configs/validation");
 
 // route POST api/users
 // desc create user
 // access Public
-
-// function test(cb) {
-
-// }
-
-// console.log(test());
-
 router.post("/", async (req, res) => {
-	const { error, value } = schema.validate(req.body);
+	const { error, value } = registerSchema.validate(req.body);
 	if (error) return res.status(400).send(error);
 
 	try {

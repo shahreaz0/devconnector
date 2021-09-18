@@ -1,5 +1,4 @@
 const router = require("express").Router();
-const Joi = require("joi");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -9,13 +8,8 @@ const User = require("../models/User");
 // auth middleware
 const auth = require("../middlewares/auth");
 
-const schema = Joi.object({
-	email: Joi.string().email().required(),
-	password: Joi.string()
-		.pattern(new RegExp("^[a-zA-Z0-9]{6,30}$"))
-		.min(6)
-		.required(),
-});
+// configs
+const { loginSchema } = require("../configs/validation");
 
 // route api/auth
 // desc Test route
@@ -32,7 +26,7 @@ router.get("/", auth, async (req, res) => {
 
 router.post("/", async (req, res) => {
 	console.log(req.body);
-	const { error, value } = schema.validate(req.body);
+	const { error, value } = loginSchema.validate(req.body);
 	if (error) return res.status(400).send(error);
 
 	const { email, password } = value;
