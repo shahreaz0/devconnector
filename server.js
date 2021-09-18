@@ -14,6 +14,10 @@ const app = express();
 app.get("/", (req, res) => {
 	res.send("API is up and running.");
 });
+app.use("/api/posts", require("./routes/posts"));
+app.use("/api/profile", require("./routes/profile"));
+app.use("/api/users", require("./routes/users"));
+app.use("/api/auth", require("./routes/auth"));
 
 // server
 const PORT = process.env.PORT || 3001;
