@@ -29,10 +29,7 @@ const profileSchema = new mongoose.Schema(
 					type: String,
 					required: true,
 				},
-				location: {
-					type: String,
-					required: true,
-				},
+				location: String,
 				from: Date,
 				to: Date,
 				current: {

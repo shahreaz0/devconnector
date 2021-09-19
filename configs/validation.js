@@ -35,4 +35,19 @@ const userProfileSchema = Joi.object({
 	linkedin: Joi.string().uri(),
 });
 
-module.exports = { registerSchema, loginSchema, userProfileSchema };
+const experienceSchema = Joi.object({
+	title: Joi.string().required(),
+	company: Joi.string().required(),
+	location: Joi.string(),
+	from: Joi.date(),
+	to: Joi.date(),
+	current: Joi.boolean(),
+	description: Joi.string(),
+});
+
+module.exports = {
+	registerSchema,
+	loginSchema,
+	userProfileSchema,
+	experienceSchema,
+};

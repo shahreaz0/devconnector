@@ -8,7 +8,10 @@ const User = require("../models/User");
 const auth = require("../middlewares/auth");
 
 // configs
-const { userProfileSchema } = require("../configs/validation");
+const {
+	userProfileSchema,
+	experienceSchema,
+} = require("../configs/validation");
 
 // route 	GET api/profile/me
 // desc 	Get current user
@@ -149,6 +152,95 @@ router.delete("/", auth, async (req, res) => {
 		await User.findOneAndRemove({ _id: req.user.id });
 		// todo => have to delete all the posts associated with it
 		res.send({ message: "Successfully deleted" });
+	} catch (error) {
+		console.log(error);
+		res.status(500).send("Server error");
+	}
+});
+
+// route 	PUT api/profile/experience
+// desc 	Update experience
+// access 	Private
+router.put("/experience", auth, async (req, res) => {
+	const { error, value } = experienceSchema.validate(req.body);
+	if (error) return res.send(error);
+	const { title, company, location, from, to, current, description } = value;
+
+	console.log(value);
+	const experienceFields = {};
+
+	experienceFields.title = title;
+	experienceFields.company = company;
+	if (location) experienceFields.location = location;
+	if (from) experienceFields.from = from;
+	if (to) experienceFields.to = to;
+
+	if (current) experienceFields.current = current;
+	else experienceFields.current = current;
+
+	if (description) experienceFields.description = description;
+
+	// res.send(experienceFields);
+
+	try {
+		const profile = await Profile.findOne({ user: req.user.id });
+		profile.experience.unshift(experienceFields);
+		await profile.save();
+		res.send(profile);
+	} catch (error) {
+		console.log(error);
+		res.status(500).send("Server error");
+	}
+});
+
+// route 	PUT api/profile/experience/:id
+// desc 	Update individual experience
+// access 	Private
+router.put("/experience/:id", auth, async (req, res) => {
+	const { error, value } = experienceSchema.validate(req.body);
+	if (error) return res.send(error);
+	const { title, company, location, from, to, current, description } = value;
+
+	const experienceFields = {};
+
+	experienceFields.title = title;
+	experienceFields.company = company;
+	if (location) experienceFields.location = location;
+	if (from) experienceFields.from = from;
+	if (to) experienceFields.to = to;
+
+	if (current) experienceFields.current = current;
+	else experienceFields.current = current;
+
+	if (description) experienceFields.description = description;
+
+	try {
+		const profile = await Profile.findOne({ user: req.user.id });
+
+		profile.experience = profile.experience.map((exp) => {
+			if (exp._id.equals(req.params.id)) return experienceFields;
+			else return exp;
+		});
+		await profile.save();
+		res.send(profile);
+	} catch (error) {
+		console.log(error);
+		res.status(500).send("Server error");
+	}
+});
+
+// route 	DELETE api/profile/experience/:id
+// desc 	Delete individual experience
+// access 	Private
+router.delete("/experience/:id", auth, async (req, res) => {
+	try {
+		const profile = await Profile.findOne({ user: req.user.id });
+
+		profile.experience = profile.experience.filter(
+			(exp) => !exp._id.equals(req.params.id)
+		);
+		await profile.save();
+		res.send(profile);
 	} catch (error) {
 		console.log(error);
 		res.status(500).send("Server error");
