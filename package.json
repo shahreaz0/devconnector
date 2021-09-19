@@ -10,6 +10,7 @@
   "author": "Shahreaz Bin Alam",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.4",
     "bcryptjs": "^2.4.3",
     "express": "^4.17.1",
     "gravatar": "^1.8.2",

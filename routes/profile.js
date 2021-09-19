@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const axios = require("axios").default;
 
 // models
 const Profile = require("../models/Profile");
@@ -363,6 +364,35 @@ router.delete("/education/:id", auth, async (req, res) => {
 		);
 		await profile.save();
 		res.send(profile);
+	} catch (error) {
+		console.log(error);
+		res.status(500).send("Server error");
+	}
+});
+
+// route 	GET api/profile/github/:username
+// desc 	Get user repos from github
+// access 	Public
+
+router.get("/github/:username", async (req, res) => {
+	try {
+		const option = {
+			method: "get",
+			url: `https://api.github.com/users/${req.params.username}/repos`,
+			params: {
+				per_page: 5,
+				sort: "created:asc",
+				client_id: process.env.GH_CLIENT_ID,
+				client_secret: process.env.GH_CLIENT_SECRET,
+			},
+			headers: {
+				"user-agent": "node.js",
+			},
+		};
+
+		const { data } = await axios(option);
+
+		res.send(data);
 	} catch (error) {
 		console.log(error);
 		res.status(500).send("Server error");
