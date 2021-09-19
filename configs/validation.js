@@ -45,9 +45,35 @@ const experienceSchema = Joi.object({
 	description: Joi.string(),
 });
 
+const educationSchema = Joi.object({
+	school: Joi.string().required(),
+	degree: Joi.string().required(),
+	current: Joi.boolean(),
+	fieldofstudy: Joi.string(),
+	grade: Joi.number().positive(),
+	from: Joi.date(),
+	to: Joi.date(),
+	extractivities: Joi.string(),
+	description: Joi.string(),
+});
+
+const updateEducationSchema = Joi.object({
+	school: Joi.string(),
+	degree: Joi.string(),
+	current: Joi.boolean(),
+	fieldofstudy: Joi.string(),
+	grade: Joi.number().positive(),
+	from: Joi.date(),
+	to: Joi.date(),
+	extractivities: Joi.string(),
+	description: Joi.string(),
+});
+
 module.exports = {
 	registerSchema,
 	loginSchema,
 	userProfileSchema,
 	experienceSchema,
+	educationSchema,
+	updateEducationSchema,
 };

@@ -11,6 +11,8 @@ const auth = require("../middlewares/auth");
 const {
 	userProfileSchema,
 	experienceSchema,
+	educationSchema,
+	updateEducationSchema,
 } = require("../configs/validation");
 
 // route 	GET api/profile/me
@@ -238,6 +240,126 @@ router.delete("/experience/:id", auth, async (req, res) => {
 
 		profile.experience = profile.experience.filter(
 			(exp) => !exp._id.equals(req.params.id)
+		);
+		await profile.save();
+		res.send(profile);
+	} catch (error) {
+		console.log(error);
+		res.status(500).send("Server error");
+	}
+});
+
+// route 	PUT api/profile/education
+// desc 	Update education
+// access 	Private
+router.put("/education", auth, async (req, res) => {
+	const { error, value } = educationSchema.validate(req.body);
+	if (error) return res.send(error);
+	const {
+		school,
+		degree,
+		current,
+		fieldofstudy,
+		from,
+		to,
+		grade,
+		extractivities,
+		description,
+	} = value;
+
+	const educationFields = {};
+
+	educationFields.school = school;
+	educationFields.degree = degree;
+	if (from) educationFields.from = from;
+	if (to) educationFields.to = to;
+	if (fieldofstudy) educationFields.fieldofstudy = fieldofstudy;
+	if (grade) educationFields.grade = grade;
+	if (extractivities) educationFields.extractivities = extractivities;
+	if (description) educationFields.description = description;
+
+	if (current) educationFields.current = current;
+	else educationFields.current = current;
+
+	try {
+		const profile = await Profile.findOne({ user: req.user.id });
+		profile.education.unshift(educationFields);
+		await profile.save();
+		res.send(profile);
+	} catch (error) {
+		console.log(error);
+		res.status(500).send("Server error");
+	}
+});
+
+// route 	PUT api/profile/education/:id
+// desc 	Update individual education
+// access 	Private
+router.put("/education/:id", auth, async (req, res) => {
+	const { error, value } = updateEducationSchema.validate(req.body);
+	if (error) return res.send(error);
+	const {
+		school,
+		degree,
+		current,
+		fieldofstudy,
+		from,
+		to,
+		grade,
+		extractivities,
+		description,
+	} = value;
+
+	try {
+		const profile = await Profile.findOne({ user: req.user.id });
+
+		const currentUserEducation = profile.education.filter((edu) =>
+			edu._id.equals(req.params.id)
+		);
+
+		let educationFields = {};
+
+		educationFields.school = school || currentUserEducation[0].school;
+		educationFields.degree = degree || currentUserEducation[0].degree;
+		educationFields.from = from || currentUserEducation.from;
+		educationFields.to = to || currentUserEducation[0].to;
+
+		educationFields.fieldofstudy =
+			fieldofstudy || currentUserEducation[0].fieldofstudy;
+
+		educationFields.grade = grade || currentUserEducation[0].grade;
+
+		educationFields.extractivities =
+			extractivities || currentUserEducation[0].extractivities;
+
+		educationFields.description =
+			description || currentUserEducation[0].description;
+
+		if (current) educationFields.current = current;
+		else educationFields.current = current;
+
+		profile.education = profile.education.map((edu) => {
+			if (edu._id.equals(req.params.id)) return educationFields;
+			else return edu;
+		});
+
+		await profile.save();
+		res.send(profile);
+	} catch (error) {
+		console.log(error);
+		res.status(500).send("Server error");
+	}
+});
+
+// route 	DELETE api/profile/education/:id
+// desc 	Delete individual education
+// access 	Private
+router.delete("/education/:id", auth, async (req, res) => {
+	try {
+		const profile = await Profile.findOne({ user: req.user.id });
+
+		profile.education = profile.education.filter(
+			(edu) => !edu._id.equals(req.params.id)
 		);
 		await profile.save();
 		res.send(profile);
