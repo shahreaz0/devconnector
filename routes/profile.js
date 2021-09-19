@@ -33,7 +33,7 @@ router.get("/me", auth, async (req, res) => {
 });
 
 // route 	POST api/profile/
-// desc 	Create profile
+// desc 	Create and update profile
 // access 	Private
 router.post("/", auth, async (req, res) => {
 	const { error, value } = userProfileSchema.validate(req.body);
@@ -95,6 +95,47 @@ router.post("/", auth, async (req, res) => {
 	} catch (error) {
 		console.log(error);
 		res.status(500).send(error);
+	}
+});
+
+// route 	GET api/profile/
+// desc 	Get all user profiles
+// access 	Public
+router.get("/", async (req, res) => {
+	try {
+		const profiles = await Profile.find().populate("user", [
+			"name",
+			"avatar",
+		]);
+
+		res.send(profiles);
+	} catch (error) {
+		console.log(error);
+		res.status(500).send("Server error");
+	}
+});
+
+// route 	GET api/profile/:id
+// desc 	Get user profile by id
+// access 	Public
+router.get("/user/:id", async (req, res) => {
+	try {
+		const profile = await Profile.findOne({ user: req.params.id }).populate(
+			"user",
+			["name", "avatar"]
+		);
+
+		if (!profile) {
+			return res.status(404).send({ message: "No profile found" });
+		}
+
+		res.send(profile);
+	} catch (error) {
+		console.log(error.kind);
+		if (error.kind === "ObjectId") {
+			return res.status(404).send({ message: "No profile found" });
+		}
+		res.status(500).send("Server error");
 	}
 });
 
