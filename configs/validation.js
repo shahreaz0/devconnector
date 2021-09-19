@@ -19,4 +19,20 @@ const loginSchema = Joi.object({
 		.required(),
 });
 
-module.exports = { registerSchema, loginSchema };
+// user profile validation
+const userProfileSchema = Joi.object({
+	status: Joi.string().required(),
+	skills: Joi.required(),
+	company: Joi.string(),
+	location: Joi.string(),
+	bio: Joi.string(),
+	website: Joi.string().uri(),
+	githubusername: Joi.string(),
+	facebook: Joi.string().uri(),
+	youtube: Joi.string().uri(),
+	instagram: Joi.string().uri(),
+	twitter: Joi.string().uri(),
+	linkedin: Joi.string().uri(),
+});
+
+module.exports = { registerSchema, loginSchema, userProfileSchema };
